@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Remote Input Panel</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+</head>
+<body>
+  <h2>Enter Password:</h2>
+  <input type="password" id="passInput">
+  <button onclick="unlock()">Unlock</button>
+
+  <div id="controlPanel" style="display:none;">
+    <h3>Remote Control Active</h3>
+    <p>Move mouse or type to send input.</p>
+  </div>
+
+  <script>
+    const PASSWORD = "your_shared_password";
+
+    function unlock() {
+      if (document.getElementById("passInput").value === PASSWORD) {
+        document.getElementById("controlPanel").style.display = "block";
+      } else {
+        alert("Incorrect password.");
+      }
+    }
+
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "YOUR_FIREBASE_API_KEY",
+      authDomain: "YOUR_FIREBASE_PROJECT.firebaseapp.com",
+      databaseURL: "https://YOUR_FIREBASE_PROJECT.firebaseio.com",
+      projectId: "YOUR_FIREBASE_PROJECT",
+      storageBucket: "YOUR_FIREBASE_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Send keyboard input
+    document.addEventListener("keydown", (e) => {
+      db.ref("input").set({
+        type: "key",
+        key: e.key,
+        timestamp: Date.now()
+      });
+    });
+
+    // Send mouse movement (just X/Y for now)
+    document.addEventListener("mousemove", (e) => {
+      db.ref("input").set({
+        type: "mouse",
+        x: e.clientX,
+        y: e.clientY,
+        timestamp: Date.now()
+      });
+    });
+  </script>
+</body>
+</html>
