@@ -2,31 +2,55 @@
 <html>
 <head>
   <title>Remote Input Panel</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+    input, button {
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    #controlPanel {
+      display: none;
+      margin-top: 50px;
+    }
+  </style>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 </head>
 <body>
   <h2>Enter Password:</h2>
   <input type="password" id="passInput">
+  <br>
   <button onclick="unlock()">Unlock</button>
 
-  <div id="controlPanel" style="display:none;">
+  <div id="controlPanel">
     <h3>Remote Control Active</h3>
     <p>Move mouse or type to send input.</p>
   </div>
 
   <script>
-    const PASSWORD = "openSesame123";
+    const PASSWORD = "schoolRemote2025"; // 👈 Change this if you want
 
     function unlock() {
-      if (document.getElementById("passInput").value === PASSWORD) {
+      const input = document.getElementById("passInput").value;
+      if (input === PASSWORD) {
+        document.getElementById("passInput").style.display = "none";
+        document.querySelector("button").style.display = "none";
+        document.querySelector("h2").innerText = "Access Granted!";
         document.getElementById("controlPanel").style.display = "block";
+        startInput();
       } else {
         alert("Incorrect password.");
       }
     }
 
-    // Initialize Firebase
+       // Initialize Firebase
    const firebaseConfig = {
     apiKey: "AIzaSyAuKvgsZrQUOPKrnTod4RiMhxVja67vp_Q",
     authDomain: "vdremote-99d5e.firebaseapp.com",
@@ -36,28 +60,28 @@
     messagingSenderId: "894907813309",
     appId: "1:894907813309:web:f40b769c2055ea936796d4"
   };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Send keyboard input
-    document.addEventListener("keydown", (e) => {
-      db.ref("input").set({
-        type: "key",
-        key: e.key,
-        timestamp: Date.now()
+    function startInput() {
+      document.addEventListener("keydown", (e) => {
+        db.ref("input").set({
+          type: "key",
+          key: e.key,
+          timestamp: Date.now()
+        });
       });
-    });
 
-    // Send mouse movement (just X/Y for now)
-    document.addEventListener("mousemove", (e) => {
-      db.ref("input").set({
-        type: "mouse",
-        x: e.clientX,
-        y: e.clientY,
-        timestamp: Date.now()
+      document.addEventListener("mousemove", (e) => {
+        db.ref("input").set({
+          type: "mouse",
+          x: e.clientX,
+          y: e.clientY,
+          timestamp: Date.now()
+        });
       });
-    });
+    }
   </script>
 </body>
 </html>
+
